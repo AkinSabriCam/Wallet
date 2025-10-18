@@ -1,9 +1,9 @@
-1 => implement unit of work concrete class
-2 => implement mapper concrete class
-3 => add update amount of account method and handle db concurency exception 
-4 => Add transaction management for inserting transaction case and manipulate amount of account
-5 => Open this use cases by public endpoints
+1 => ✅ implement unit of work concrete class
+2 => ✅ implement mapper concrete class
+3 => ✅ add update amount of account method and handle db concurency exception
+4 => ✅ Add transaction management for inserting transaction case and manipulate amount of account
+5 => ✅ Open this use cases by public endpoints
 6 => Create another api that consumes Wallet Api
 7 => Second api will include circuet breaker and retry policies
 8 => Second api will try to fetch all transaction which means a lot of data (simulate working with many data)
-9 => Idempotency will be applied (Check it out how it is gonna work with retry and circuet breaker policy) 
+9 => Idempotency will be applied (Check it out how it is gonna work with retry and circuet breaker policy)

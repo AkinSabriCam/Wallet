@@ -16,7 +16,8 @@ public class AccountEntity
     
     public Currency Currency { get; set; }
     
-    public byte[] RowVersion { get; set; }
-    
+//    public byte[] RowVersion { get; set; }
+    public uint Version { get; set; } 
+
     public DateTime CreatedAt { get; set; }
 }

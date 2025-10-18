@@ -1,10 +1,31 @@
+using Application.Abstransaction;
+using Application.Services;
+using Domain.Repositories;
+using Infrastructure;
+using Infrastructure.Mapping;
+using Infrastructure.Repositories;
+using Infrastructure.UnitOfWork;
+using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
+using IMapper = Application.Abstransaction.IMapper;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddDbContext<WalletDbContext>(opt => 
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("Wallet")));
+
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IMapper>(x=> 
+    new MyMapper(new Mapper()));
 
 var app = builder.Build();
 

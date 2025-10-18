@@ -28,29 +28,44 @@ public class TransactionService : ITransactionService
         return _mapper.Map<List<TransactionDto>>(transactions);
     }
 
-
     public async Task<TransactionDto> Add(CreateTransactionDto dto)
     {
-        _unitOfWork.
-        var account = await _accountRepository.GetAccountById(dto.AccountId);
+        await _unitOfWork.StartTransactionAsync();
 
-        if (account == null)
+        try
         {
-            throw new Exception("Account not found");
-        }
+            var account = await _accountRepository.GetAccountById(dto.AccountId);
 
-        if (account.Amount < dto.Amount)
-        {
-            throw new Exception("Account amount is not enough for this transaction");
+            if (account == null)
+            {
+                throw new Exception("Account not found");
+            }
+
+            if (account.Amount < dto.Amount)
+            {
+                throw new Exception("Account amount is not enough for this transaction");
+            }
+        
+            var transaction = await _repository.Add(new TransactionEntity()
+            {
+                Amount = dto.Amount,
+                AccountId = dto.AccountId,
+                UserId = dto.UserId,
+            });
+
+            account.Amount -= dto.Amount;
+
+            await _unitOfWork.SaveAsync();
+
+            await _unitOfWork.CommitAsync();
+            
+            return _mapper.Map<TransactionDto>(transaction);
         }
-        
-        var transaction = await _repository.Add(new TransactionEntity()
+        catch (Exception)
         {
-            Amount = dto.Amount,
-            AccountId = dto.AccountId,
-            UserId = dto.UserId,
-        });
-        
-        return _mapper.Map<TransactionDto>(transaction);
+            await _unitOfWork.RollbackAsync();
+
+            throw;
+        }
     }
 }

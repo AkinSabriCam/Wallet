@@ -9,10 +9,12 @@ public class AccountService : IAccountService
 {
     private readonly IAccountRepository _accountRepository;
     private readonly IMapper _mapper;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AccountService(IMapper mapper, IAccountRepository accountRepository)
+    public AccountService(IMapper mapper, IAccountRepository accountRepository, IUnitOfWork unitOfWork)
     {
         _accountRepository= accountRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -48,6 +50,8 @@ public class AccountService : IAccountService
             Amount = dto.Amount,
             UserId = dto.UserId,
         });
+
+        await _unitOfWork.SaveAsync();
         
         return _mapper.Map<AccountDto>(account);
     }

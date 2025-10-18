@@ -18,9 +18,9 @@ public class AccountRepository : IAccountRepository
         return await _accounts.Where(x => x.UserId == userId).ToListAsync();
     }
 
-    public async Task<AccountEntity> GetAccountById(Guid id)
+    public async Task<AccountEntity?> GetAccountById(Guid id)
     {
-        return await _accounts.FirstOrDefaultAsync(x => x.Id == id);
+        return await _accounts.AsTracking().FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<AccountEntity> Add(AccountEntity account)

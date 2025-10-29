@@ -1,6 +1,6 @@
-namespace Infrastructure.Abstraction;
+namespace Application.Abstraction;
 
-public class DecreaseWalletAmount
+public class CreateTransactionDto
 {
     public string UserId { get; set; }
     

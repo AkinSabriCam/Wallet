@@ -2,7 +2,7 @@ using Application.DTOs;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers;
+namespace Wallet.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -28,7 +28,7 @@ public class TransactionsController : ControllerBase
     {
         HttpContext.Request.Headers.TryGetValue("x-user-id", out var userId);
         dto.UserId = Guid.Parse(userId);
-        
+        throw new Exception();
         return Ok(await _transactionService.Pay(dto));
     }
     

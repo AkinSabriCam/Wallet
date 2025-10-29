@@ -1,12 +1,12 @@
-using Api.Models;
+using Application.Services.DTOs;
 using Domain.Entities;
 using Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers;
+namespace Shopping.Api.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ProductController(IProductRepository productRepository) : ControllerBase
 {
     [HttpGet]

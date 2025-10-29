@@ -2,7 +2,7 @@ using Application.DTOs;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers;
+namespace Wallet.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]

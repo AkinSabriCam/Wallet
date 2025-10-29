@@ -5,7 +5,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Wallet", "Wallet", "{95AAE8
 		Wallet\TODO.txt = Wallet\TODO.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Wallet\Api\Api.csproj", "{B194B220-034F-4D25-98D2-83CB23EC65DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wallet.Api", "Wallet\Wallet.Api\Wallet.Api.csproj", "{B194B220-034F-4D25-98D2-83CB23EC65DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Wallet\Domain\Domain.csproj", "{B820667E-D7DB-4EF6-902C-DE470DA949A4}"
 EndProject
@@ -15,11 +15,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Wallet\In
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shopping", "Shopping", "{FF7FE19A-2800-45C8-834C-208DD677AAD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Shopping\Api\Api.csproj", "{6181BA78-03D2-4763-A5A6-C3AA910D2984}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shopping.Api", "Shopping\Shopping.Api\Shopping.Api.csproj", "{6181BA78-03D2-4763-A5A6-C3AA910D2984}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Shopping\Domain\Domain.csproj", "{17FAE48D-7E67-49F5-B91C-878A75D6AC52}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Shopping\Infrastructure\Infrastructure.csproj", "{4475D6E1-1E40-4185-B786-86BC87FD3BE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Shopping\Application\Application.csproj", "{683F8249-590A-4190-945B-9BC8C082FBCC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +36,7 @@ Global
 		{6181BA78-03D2-4763-A5A6-C3AA910D2984} = {FF7FE19A-2800-45C8-834C-208DD677AAD3}
 		{17FAE48D-7E67-49F5-B91C-878A75D6AC52} = {FF7FE19A-2800-45C8-834C-208DD677AAD3}
 		{4475D6E1-1E40-4185-B786-86BC87FD3BE5} = {FF7FE19A-2800-45C8-834C-208DD677AAD3}
+		{683F8249-590A-4190-945B-9BC8C082FBCC} = {FF7FE19A-2800-45C8-834C-208DD677AAD3}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{B194B220-034F-4D25-98D2-83CB23EC65DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -64,5 +67,9 @@ Global
 		{4475D6E1-1E40-4185-B786-86BC87FD3BE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4475D6E1-1E40-4185-B786-86BC87FD3BE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4475D6E1-1E40-4185-B786-86BC87FD3BE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{683F8249-590A-4190-945B-9BC8C082FBCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{683F8249-590A-4190-945B-9BC8C082FBCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{683F8249-590A-4190-945B-9BC8C082FBCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{683F8249-590A-4190-945B-9BC8C082FBCC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

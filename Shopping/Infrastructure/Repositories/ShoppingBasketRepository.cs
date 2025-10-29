@@ -6,12 +6,10 @@ namespace Infrastructure.Repositories;
 
 public class ShoppingBasketRepository : IShoppingBasketRepository
 {
-    private readonly ShoppingDbContext _context;
     private readonly DbSet<ShoppingBasketEntity> shoppingBasket;
     
     public ShoppingBasketRepository(ShoppingDbContext context)
     {
-        _context = context;
         shoppingBasket = context.Set<ShoppingBasketEntity>();
     }
 
@@ -24,7 +22,6 @@ public class ShoppingBasketRepository : IShoppingBasketRepository
     {
         await shoppingBasket.AddAsync(shoppingBasketEntity);
 
-        await _context.SaveChangesAsync();
         return shoppingBasketEntity;
     }
 }

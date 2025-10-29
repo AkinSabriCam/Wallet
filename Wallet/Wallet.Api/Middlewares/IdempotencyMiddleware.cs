@@ -5,7 +5,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 
-namespace Api.Middlewares;
+namespace Wallet.Api.Middlewares;
 
 public class IdempotencyMiddleware : IMiddleware
 {

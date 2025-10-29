@@ -1,4 +1,4 @@
-using Api.Middlewares;
+using Wallet.Api.Middlewares;
 using Application.Abstransaction;
 using Application.Services;
 using Domain.Repositories;

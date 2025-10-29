@@ -18,13 +18,16 @@ public class AccountsController : ControllerBase
     [HttpGet]
     [Route("get-by-id")]
     public async Task<IActionResult> Get(Guid id)
-    {
+    { 
         return Ok(await _accountService.GetAccount(id));
     }
     
     [HttpPost]
     public async Task<IActionResult> Create(CreateAccountDto dto)
     {
+        HttpContext.Request.Headers.TryGetValue("x-user-id", out var userId);
+        dto.UserId = Guid.Parse(userId.ToString());
+        
         return Ok(await _accountService.AddAccount(dto));
     }
 }

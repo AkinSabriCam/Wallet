@@ -1,6 +1,6 @@
 namespace Application.DTOs;
 
-public class CreateTransactionDto
+public class PaymentDto
 {
     public Guid UserId { get; set; }
     

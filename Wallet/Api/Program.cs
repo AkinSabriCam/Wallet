@@ -1,3 +1,4 @@
+using Api.Middlewares;
 using Application.Abstransaction;
 using Application.Services;
 using Domain.Repositories;
@@ -27,6 +28,8 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMapper>(x=> 
     new MyMapper(new Mapper()));
 
+builder.Services.AddScoped<IdempotencyMiddleware>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -38,7 +41,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseMiddleware<IdempotencyMiddleware>();
 app.MapControllers();
 
 app.Run();

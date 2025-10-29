@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class TransactionsController : ControllerBase
 {
     private readonly ITransactionService _transactionService;
@@ -23,9 +23,21 @@ public class TransactionsController : ControllerBase
         return Ok(await _transactionService.GetTransactions(accountId));
     }
     
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateTransactionDto dto)
+    [HttpPost("pay-by-wallet")]
+    public async Task<IActionResult> Create(PaymentDto dto)
     {
-        return Ok(await _transactionService.Add(dto));
+        HttpContext.Request.Headers.TryGetValue("x-user-id", out var userId);
+        dto.UserId = Guid.Parse(userId);
+        
+        return Ok(await _transactionService.Pay(dto));
+    }
+    
+    [HttpPost("cancel-payment")]
+    public async Task<IActionResult> CancelTransaction(PaymentDto dto)
+    {
+        HttpContext.Request.Headers.TryGetValue("x-user-id", out var userId);
+        dto.UserId = Guid.Parse(userId);
+        
+        return Ok(await _transactionService.CancelPayment(dto));
     }
 }

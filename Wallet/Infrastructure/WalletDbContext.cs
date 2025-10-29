@@ -34,6 +34,12 @@ public class WalletDbContext : DbContext
                 .WithMany().HasForeignKey(x => x.AccountId);
         });
         
+        modelBuilder.Entity<HttpRequestEntity>(builder =>
+        {
+            builder.ToTable("http_requests");
+            builder.HasKey(x => new {x.UserId, x.Path, x.RequestId, x.BodyHash});
+        });
+        
         base.OnModelCreating(modelBuilder);
     }
 }

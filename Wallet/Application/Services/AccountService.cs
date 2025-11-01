@@ -1,5 +1,6 @@
 using Application.Abstransaction;
 using Application.DTOs;
+using Application.Utilities;
 using Domain.Entities;
 using Domain.Repositories;
 
@@ -18,30 +19,30 @@ public class AccountService : IAccountService
         _mapper = mapper;
     }
 
-    public async Task<AccountDto> GetAccount(Guid accountId)
+    public async Task<ServiceResult<AccountDto>> GetAccount(Guid accountId)
     {
         var account = await _accountRepository.GetAccountById(accountId);
 
         if (account == null)
         {
-            throw new Exception("Account not found");
+            return ServiceResult.Fail<AccountDto>(["Account not found"]);
         }
         
-        return _mapper.Map<AccountDto>(account);
+        return ServiceResult.Success(_mapper.Map<AccountDto>(account));
     }
 
-    public async Task<List<AccountDto>> GetAccounts(Guid userId)
+    public async Task<ServiceResult<List<AccountDto>>> GetAccounts(Guid userId)
     {
         var account = await _accountRepository.GetAccounts(userId);
 
-        return _mapper.Map<List<AccountDto>>(account);    
+        return ServiceResult.Success(_mapper.Map<List<AccountDto>>(account));    
     }
 
-    public async Task<AccountDto> AddAccount(CreateAccountDto dto)
+    public async Task<ServiceResult<AccountDto>> AddAccount(CreateAccountDto dto)
     {
         if (await _accountRepository.IsExist(dto.UserId, dto.Currency))
         {
-            throw new Exception("Account already exists");
+            return ServiceResult.Fail<AccountDto>(["Account already exists"]);
         }
         
         var account = await _accountRepository.Add(new AccountEntity()
@@ -53,6 +54,27 @@ public class AccountService : IAccountService
 
         await _unitOfWork.SaveAsync();
         
-        return _mapper.Map<AccountDto>(account);
+        return ServiceResult.Success(_mapper.Map<AccountDto>(account));
+    }
+
+    public async Task<ServiceResult> UpdateAmount(Guid accountId, decimal amount)
+    {
+        var account = await _accountRepository.GetAccountById(accountId);
+
+        if (account == null)
+        {
+            return ServiceResult.Fail([$"Account not found! Account Id :{account}"]);
+        }
+        
+        if((account.Amount + amount) < 0 )
+        {
+            return ServiceResult.Fail(["Account amount is not enough for this transaction"]);
+        }
+        
+        account.Amount += amount;
+
+        await _unitOfWork.SaveAsync();
+        
+        return ServiceResult.Success();
     }
 }

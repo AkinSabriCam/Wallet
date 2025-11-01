@@ -19,15 +19,16 @@ public class IdempotencyMiddleware : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         // only for methods that modify state (optional)
-        if (!HttpMethods.IsPost(context.Request.Method) && !HttpMethods.IsPut(context.Request.Method) &&
+        if (!HttpMethods.IsPost(context.Request.Method) && 
+            !HttpMethods.IsPut(context.Request.Method) &&
             !HttpMethods.IsPatch(context.Request.Method))
         {
             await next(context);
+         
             return;
         }
 
-        StringValues requestId;
-        context.Request.Headers.TryGetValue("x-request-id", out requestId);
+        context.Request.Headers.TryGetValue("x-request-id", out var requestId);
 
         if (string.IsNullOrEmpty(requestId))
         {
@@ -49,27 +50,40 @@ public class IdempotencyMiddleware : IMiddleware
         var dbContext = scope.ServiceProvider.GetRequiredService<WalletDbContext>();
         var dbTable = dbContext.Set<HttpRequestEntity>();
 
-        if (await dbTable.AsNoTracking()
-                .AnyAsync(x => x.BodyHash == hash && x.UserId == userId.ToString() &&
-                               x.Path == path.ToString() && x.RequestId == requestId.ToString()))
+        var httpRequest = await dbTable.AsNoTracking().FirstOrDefaultAsync(x => x.BodyHash == hash &&
+            x.UserId == userId.ToString() &&
+            x.Path == path.ToString() &&
+            x.RequestId == requestId.ToString());
+
+        if (httpRequest != null && httpRequest.Status == HttpRequestEntityStatus.Pending)
         {
+            // this case for requests that sending repeatedly by a policy like retry 
             context.Response.StatusCode = StatusCodes.Status409Conflict;
             await context.Response.WriteAsync("Duplicate request (idempotent).");
 
             return;
         }
 
-        await next(context);
+        if (httpRequest != null && httpRequest.Status == HttpRequestEntityStatus.Completed)
+        {
+            context.Response.StatusCode = StatusCodes.Status200OK;
+            await context.Response.WriteAsync(httpRequest.Response);
+
+            return;
+        }
 
         await dbTable.AddAsync(new HttpRequestEntity()
         {
             RequestId = requestId,
             Path = path,
             UserId = userId,
-            BodyHash = hash
+            BodyHash = hash,
+            Status = HttpRequestEntityStatus.Pending
         });
-
+    
         await dbContext.SaveChangesAsync();
+
+        await next(context);
     }
 
     private static string HashTheBody(string body)

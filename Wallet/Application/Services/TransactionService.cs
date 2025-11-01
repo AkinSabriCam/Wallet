@@ -1,105 +1,88 @@
 using Application.Abstransaction;
 using Application.DTOs;
+using Application.Utilities;
 using Domain.Entities;
 using Domain.Repositories;
 
 namespace Application.Services;
 
-public class TransactionService : ITransactionService
+public class TransactionService(
+    ITransactionRepository repository,
+    IMapper mapper,
+    IAccountService accountService,
+    IUnitOfWork unitOfWork)
+    : ITransactionService
 {
-    private readonly ITransactionRepository _repository;
-    private readonly IAccountRepository _accountRepository;
-    private readonly IMapper _mapper;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public TransactionService(ITransactionRepository repository, IMapper mapper,
-        IAccountRepository accountRepository, IUnitOfWork unitOfWork)
+    public async Task<ServiceResult<List<TransactionDto>>> GetTransactions(Guid accountId)
     {
-        _repository = repository;
-        _mapper = mapper;
-        _accountRepository = accountRepository;
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<List<TransactionDto>> GetTransactions(Guid accountId)
-    {
-        var transactions = await _repository.GetTransactions(accountId);
+        var transactions = await repository.GetTransactions(accountId);
         
-        return _mapper.Map<List<TransactionDto>>(transactions);
+        return ServiceResult.Success(mapper.Map<List<TransactionDto>>(transactions));
     }
 
-    public async Task<TransactionDto> Pay(PaymentDto dto)
+    public async Task<ServiceResult<TransactionDto>> Pay(PaymentDto dto)
     {
-        await _unitOfWork.StartTransactionAsync();
+        await unitOfWork.StartTransactionAsync();
 
         try
         {
-            var account = await _accountRepository.GetAccountById(dto.AccountId);
+            var result = await accountService.UpdateAmount(dto.AccountId, (-1 * Math.Abs(dto.Amount)));
 
-            if (account == null)
+            if (!result.IsSuccess)
             {
-                throw new Exception("Account not found");
+                return ServiceResult.Fail<TransactionDto>(result.ErrorMessages);
             }
-
-            if (account.Amount < dto.Amount)
-            {
-                throw new Exception("Account amount is not enough for this transaction");
-            }
-        
-            var transaction = await _repository.Add(new TransactionEntity()
+            
+            var transaction = await repository.Add(new TransactionEntity()
             {
                 Amount = (dto.Amount * -1),
                 AccountId = dto.AccountId,
                 UserId = dto.UserId,
             });
 
-            account.Amount -= dto.Amount;
+            await unitOfWork.SaveAsync();
 
-            await _unitOfWork.SaveAsync();
-
-            await _unitOfWork.CommitAsync();
+            await unitOfWork.CommitAsync();
             
-            return _mapper.Map<TransactionDto>(transaction);
+            return ServiceResult.Success(mapper.Map<TransactionDto>(transaction));
         }
         catch (Exception)
         {
-            await _unitOfWork.RollbackAsync();
+            await unitOfWork.RollbackAsync();
 
             throw;
         }
     }
     
-    public async Task<TransactionDto> CancelPayment(PaymentDto dto)
+    public async Task<ServiceResult<TransactionDto>> CancelPayment(PaymentDto dto)
     {
-        await _unitOfWork.StartTransactionAsync();
+        await unitOfWork.StartTransactionAsync();
 
         try
         {
-            var account = await _accountRepository.GetAccountById(dto.AccountId);
+            var updateAmountResult = await accountService.UpdateAmount(dto.AccountId, dto.Amount);
 
-            if (account == null)
+            if (!updateAmountResult.IsSuccess)
             {
-                throw new Exception("Account not found");
+                return ServiceResult.Fail<TransactionDto>(updateAmountResult.ErrorMessages);
             }
         
-            var transaction = await _repository.Add(new TransactionEntity()
+            var transaction = await repository.Add(new TransactionEntity()
             {
                 Amount = dto.Amount,
                 AccountId = dto.AccountId,
                 UserId = dto.UserId,
             });
 
-            account.Amount += dto.Amount;
+            await unitOfWork.SaveAsync();
 
-            await _unitOfWork.SaveAsync();
-
-            await _unitOfWork.CommitAsync();
+            await unitOfWork.CommitAsync();
             
-            return _mapper.Map<TransactionDto>(transaction);
+            return ServiceResult.Success(mapper.Map<TransactionDto>(transaction));
         }
         catch (Exception)
         {
-            await _unitOfWork.RollbackAsync();
+            await unitOfWork.RollbackAsync();
 
             throw;
         }

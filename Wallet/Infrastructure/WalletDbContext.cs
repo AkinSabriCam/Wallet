@@ -38,6 +38,7 @@ public class WalletDbContext : DbContext
         {
             builder.ToTable("http_requests");
             builder.HasKey(x => new {x.UserId, x.Path, x.RequestId, x.BodyHash});
+            builder.Property(x => x.Status).HasConversion<string>();
         });
         
         base.OnModelCreating(modelBuilder);

@@ -9,4 +9,8 @@ public class HttpRequestEntity
     public string RequestId { get; set; }
     
     public string BodyHash { get; set; }
+    
+    public HttpRequestEntityStatus Status { get; set; }
+    
+    public string? Response { get; set; }
 }

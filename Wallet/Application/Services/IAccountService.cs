@@ -1,12 +1,15 @@
 using Application.DTOs;
+using Application.Utilities;
 
 namespace Application.Services;
 
 public interface IAccountService
 {
-    Task<AccountDto> GetAccount(Guid accountId);
+    Task<ServiceResult<AccountDto>> GetAccount(Guid accountId);
     
-    Task<List<AccountDto>> GetAccounts(Guid userId);
+    Task<ServiceResult<List<AccountDto>>> GetAccounts(Guid userId);
 
-    Task<AccountDto> AddAccount(CreateAccountDto dto);
+    Task<ServiceResult<AccountDto>> AddAccount(CreateAccountDto dto);
+    
+    Task<ServiceResult> UpdateAmount(Guid accountId, decimal amount);
 }

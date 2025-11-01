@@ -1,13 +1,14 @@
 using Application.DTOs;
+using Application.Utilities;
 
 namespace Application.Services;
 
 public interface ITransactionService
 {
-    Task<List<TransactionDto>> GetTransactions(Guid accountId);
+    Task<ServiceResult<List<TransactionDto>>> GetTransactions(Guid accountId);
     
-    Task<TransactionDto> Pay(PaymentDto dto);
+    Task<ServiceResult<TransactionDto>> Pay(PaymentDto dto);
     
-    Task<TransactionDto> CancelPayment(PaymentDto dto);
+    Task<ServiceResult<TransactionDto>> CancelPayment(PaymentDto dto);
 
 }

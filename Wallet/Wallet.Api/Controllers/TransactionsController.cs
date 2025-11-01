@@ -1,5 +1,5 @@
 using Application.DTOs;
-using Application.Services;
+using Infrastructure.Orchestration.Transaction;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Wallet.Api.Controllers;
@@ -8,19 +8,18 @@ namespace Wallet.Api.Controllers;
 [Route("api/[controller]")]
 public class TransactionsController : ControllerBase
 {
-    private readonly ITransactionService _transactionService;
+    private readonly ITransactionDecorator _transactionDecorator;
 
-    public TransactionsController(ITransactionService transactionService)
+    public TransactionsController(ITransactionDecorator transactionDecorator)
     {
-        _transactionService = transactionService;
+        _transactionDecorator = transactionDecorator;
     }
-    
     
     [HttpGet]
     [Route("get-by-accountId")]
     public async Task<IActionResult> Get(Guid accountId)
     {
-        return Ok(await _transactionService.GetTransactions(accountId));
+        return Ok(await _transactionDecorator.GetTransactions(accountId));
     }
     
     [HttpPost("pay-by-wallet")]
@@ -28,8 +27,8 @@ public class TransactionsController : ControllerBase
     {
         HttpContext.Request.Headers.TryGetValue("x-user-id", out var userId);
         dto.UserId = Guid.Parse(userId);
-        throw new Exception();
-        return Ok(await _transactionService.Pay(dto));
+
+        return Ok(await _transactionDecorator.Pay(dto));
     }
     
     [HttpPost("cancel-payment")]
@@ -38,6 +37,6 @@ public class TransactionsController : ControllerBase
         HttpContext.Request.Headers.TryGetValue("x-user-id", out var userId);
         dto.UserId = Guid.Parse(userId);
         
-        return Ok(await _transactionService.CancelPayment(dto));
+        return Ok(await _transactionDecorator.CancelPayment(dto));
     }
 }

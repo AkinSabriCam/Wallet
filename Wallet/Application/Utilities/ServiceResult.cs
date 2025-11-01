@@ -7,10 +7,10 @@ public class ServiceResult
         ErrorMessages = errorMessages;
     }
     
-    protected ServiceResult()
+    public ServiceResult()
     {
-        
     }
+    
     public List<string> ErrorMessages { get; set; } = new();
     
     public bool IsSuccess => ErrorMessages.Count == 0;
@@ -48,5 +48,10 @@ public class ServiceResult<T> : ServiceResult
     public ServiceResult(List<string> errorMessages)
     {
         ErrorMessages = errorMessages;
+    }
+
+    public ServiceResult()
+    {
+        
     }
 }

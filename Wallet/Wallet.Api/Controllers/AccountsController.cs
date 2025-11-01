@@ -1,5 +1,5 @@
 using Application.DTOs;
-using Application.Services;
+using Infrastructure.Orchestration.Account;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Wallet.Api.Controllers;
@@ -8,18 +8,18 @@ namespace Wallet.Api.Controllers;
 [Route("[controller]")]
 public class AccountsController : ControllerBase
 {
-    private readonly IAccountService _accountService;
+    private readonly IAccountDecorator _accountDecorator;
 
-    public AccountsController(IAccountService accountService)
+    public AccountsController(IAccountDecorator accountDecorator)
     {
-        _accountService = accountService;
+        _accountDecorator = accountDecorator;
     }
 
     [HttpGet]
     [Route("get-by-id")]
     public async Task<IActionResult> Get(Guid id)
     { 
-        return Ok(await _accountService.GetAccount(id));
+        return Ok(await _accountDecorator.GetAccount(id));
     }
     
     [HttpPost]
@@ -28,6 +28,7 @@ public class AccountsController : ControllerBase
         HttpContext.Request.Headers.TryGetValue("x-user-id", out var userId);
         dto.UserId = Guid.Parse(userId.ToString());
         
-        return Ok(await _accountService.AddAccount(dto));
+        return Ok(await _accountDecorator.AddAccount(dto));
+
     }
 }

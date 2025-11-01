@@ -9,9 +9,7 @@ namespace Application.Services;
 public class TransactionService(
     ITransactionRepository repository,
     IMapper mapper,
-    IAccountService accountService,
-    IUnitOfWork unitOfWork)
-    : ITransactionService
+    IAccountService accountService) : ITransactionService
 {
     public async Task<ServiceResult<List<TransactionDto>>> GetTransactions(Guid accountId)
     {
@@ -22,69 +20,39 @@ public class TransactionService(
 
     public async Task<ServiceResult<TransactionDto>> Pay(PaymentDto dto)
     {
-        await unitOfWork.StartTransactionAsync();
+        var result = await accountService.UpdateAmount(dto.AccountId, (-1 * Math.Abs(dto.Amount)));
 
-        try
+        if (!result.IsSuccess)
         {
-            var result = await accountService.UpdateAmount(dto.AccountId, (-1 * Math.Abs(dto.Amount)));
-
-            if (!result.IsSuccess)
-            {
-                return ServiceResult.Fail<TransactionDto>(result.ErrorMessages);
-            }
-            
-            var transaction = await repository.Add(new TransactionEntity()
-            {
-                Amount = (dto.Amount * -1),
-                AccountId = dto.AccountId,
-                UserId = dto.UserId,
-            });
-
-            await unitOfWork.SaveAsync();
-
-            await unitOfWork.CommitAsync();
-            
-            return ServiceResult.Success(mapper.Map<TransactionDto>(transaction));
+            return ServiceResult.Fail<TransactionDto>(result.ErrorMessages);
         }
-        catch (Exception)
+
+        var transaction = await repository.Add(new TransactionEntity()
         {
-            await unitOfWork.RollbackAsync();
+            Amount = (dto.Amount * -1),
+            AccountId = dto.AccountId,
+            UserId = dto.UserId,
+        });
 
-            throw;
-        }
+        return ServiceResult.Success(mapper.Map<TransactionDto>(transaction));
     }
     
     public async Task<ServiceResult<TransactionDto>> CancelPayment(PaymentDto dto)
     {
-        await unitOfWork.StartTransactionAsync();
+        var updateAmountResult = await accountService.UpdateAmount(dto.AccountId, dto.Amount);
 
-        try
+        if (!updateAmountResult.IsSuccess)
         {
-            var updateAmountResult = await accountService.UpdateAmount(dto.AccountId, dto.Amount);
-
-            if (!updateAmountResult.IsSuccess)
-            {
-                return ServiceResult.Fail<TransactionDto>(updateAmountResult.ErrorMessages);
-            }
-        
-            var transaction = await repository.Add(new TransactionEntity()
-            {
-                Amount = dto.Amount,
-                AccountId = dto.AccountId,
-                UserId = dto.UserId,
-            });
-
-            await unitOfWork.SaveAsync();
-
-            await unitOfWork.CommitAsync();
-            
-            return ServiceResult.Success(mapper.Map<TransactionDto>(transaction));
+            return ServiceResult.Fail<TransactionDto>(updateAmountResult.ErrorMessages);
         }
-        catch (Exception)
+
+        var transaction = await repository.Add(new TransactionEntity()
         {
-            await unitOfWork.RollbackAsync();
+            Amount = dto.Amount,
+            AccountId = dto.AccountId,
+            UserId = dto.UserId,
+        });
 
-            throw;
-        }
+        return ServiceResult.Success(mapper.Map<TransactionDto>(transaction));
     }
 }

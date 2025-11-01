@@ -1,9 +1,10 @@
+using Application.Abstransaction;
 using Application.DTOs;
 using Application.Utilities;
 
 namespace Application.Services;
 
-public interface ITransactionService
+public interface ITransactionService : IApplicationService
 {
     Task<ServiceResult<List<TransactionDto>>> GetTransactions(Guid accountId);
     

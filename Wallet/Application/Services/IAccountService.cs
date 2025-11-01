@@ -1,9 +1,10 @@
+using Application.Abstransaction;
 using Application.DTOs;
 using Application.Utilities;
 
 namespace Application.Services;
 
-public interface IAccountService
+public interface IAccountService : IApplicationService
 {
     Task<ServiceResult<AccountDto>> GetAccount(Guid accountId);
     

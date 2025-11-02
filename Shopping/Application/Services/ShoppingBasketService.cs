@@ -1,5 +1,6 @@
 using Application.Abstraction;
 using Application.Services.DTOs;
+using Application.Utilities;
 using Domain.Entities;
 using Domain.Repositories;
 
@@ -21,35 +22,40 @@ public class ShoppingBasketService(
         };
     }
 
-    public async Task Create(AddShoppingBasketDto dto)
+    public async Task<ServiceResult> Create(AddShoppingBasketDto dto)
     {
-        var isPaid = await transactionApi.Pay(new CreateTransactionDto()
+        var paymentResult = await transactionApi.Pay(new CreateTransactionDto()
         {
+            AccountId = dto.AccountId,
             Amount = dto.TotalAmount,
             UserId = dto.UserId,
         });
 
-        if (isPaid)
+        if (paymentResult.IsSuccess)
         {
             try
             {
                 await shoppingBasketRepository.Add(new ShoppingBasketEntity()
                 {
                     TotalAmount = dto.TotalAmount,
-                    UserId = dto.UserId
+                    UserId = dto.UserId,
+                    Products = dto.ProductIds.Select(x=> new ShoppingBasketProductEntity()
+                    {
+                        ProductId = x
+                    }).ToList()
                 });
 
                 await unitOfWork.SaveAsync();
             }
             catch (Exception ex)
             {
-                var isCancelled = await transactionApi.CancelPayment(new CreateTransactionDto()
+                var cancelResult = await transactionApi.CancelPayment(new CreateTransactionDto()
                 {
                     UserId = dto.UserId,
                     Amount = dto.TotalAmount,
                 });
 
-                if (!isCancelled)
+                if (!cancelResult.IsSuccess)
                 {
                     Console.WriteLine("Could not cancelled the payment!");
                     //todo: take action like save this amount and info the wallet api 
@@ -58,5 +64,7 @@ public class ShoppingBasketService(
                 throw;
             }
         }
+
+        return paymentResult;
     }
 }

@@ -1,4 +1,5 @@
 using Application.Services.DTOs;
+using Application.Utilities;
 
 namespace Application.Services;
 
@@ -6,5 +7,5 @@ public interface IShoppingBasketService
 {
     Task<ShoppingBasketDto> GetShoppingBasketAsync(Guid id);
     
-    Task Create(AddShoppingBasketDto dto);
+    Task<ServiceResult> Create(AddShoppingBasketDto dto);
 }

@@ -1,9 +1,10 @@
+using Application.Utilities;
+
 namespace Application.Abstraction;
 
 public interface ITransactionApi
 {
-    Task<bool> Pay(CreateTransactionDto model);
+    Task<ServiceResult> Pay(CreateTransactionDto model);
     
-    Task<bool> CancelPayment(CreateTransactionDto model);
-
+    Task<ServiceResult> CancelPayment(CreateTransactionDto model);
 }

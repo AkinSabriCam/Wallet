@@ -147,7 +147,8 @@ public class BaseDecorator
                 UserId = userId,
                 Path = _httpContext.Request.Path,
                 BodyHash = bodyHash,
-                RequestId = requestId
+                RequestId = requestId,
+                Status = HttpRequestEntityStatus.Pending
             });
 
             await _unitOfWork.SaveAsync();

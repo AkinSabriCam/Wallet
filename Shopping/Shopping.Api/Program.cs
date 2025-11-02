@@ -27,12 +27,13 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddHttpClient<ITransactionApi, TransactionClient>(
         client => client.BaseAddress = new Uri("https://localhost:7260"))
+    
     // Hepsini tek bir pipeline altında topla
     .AddResilienceHandler("backend-pipeline", pipeline =>
     {
         // 1) İstek başına üst limit
-        //pipeline.AddTimeout(TimeSpan.FromSeconds(5));
-
+        pipeline.AddTimeout(TimeSpan.FromSeconds(5));
+        
         // 2) Retry (sarsmadan, jitter’lı backoff)
         pipeline.AddRetry(new HttpRetryStrategyOptions
         {

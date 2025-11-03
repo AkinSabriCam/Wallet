@@ -8,7 +8,7 @@ namespace Application.Services;
 
 public class ShoppingBasketService(
     IShoppingBasketRepository shoppingBasketRepository,
-    ITransactionApi transactionApi,IUnitOfWork unitOfWork) : IShoppingBasketService
+    ITransactionApi transactionApi) : IShoppingBasketService
 {
     public async Task<ShoppingBasketDto> GetShoppingBasketAsync(Guid id)
     {
@@ -44,10 +44,8 @@ public class ShoppingBasketService(
                         ProductId = x
                     }).ToList()
                 });
-
-                await unitOfWork.SaveAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 var cancelResult = await transactionApi.CancelPayment(new CreateTransactionDto()
                 {
@@ -58,7 +56,6 @@ public class ShoppingBasketService(
                 if (!cancelResult.IsSuccess)
                 {
                     Console.WriteLine("Could not cancelled the payment!");
-                    //todo: take action like save this amount and info the wallet api 
                 }
 
                 throw;

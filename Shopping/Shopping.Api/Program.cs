@@ -22,7 +22,8 @@ builder.Services.AddDbContext<ShoppingDbContext>(opt =>
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IShoppingBasketRepository, ShoppingBasketRepository>();
-builder.Services.AddScoped<IShoppingBasketService, ShoppingBasketService>();
+builder.Services.AddScoped<ShoppingBasketService>();
+builder.Services.AddScoped<IShoppingBasketService, Infrastructure.Orchestration.ShoppingBasket.ShoppingBasketDecorator>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddHttpClient<ITransactionApi, TransactionClient>(
